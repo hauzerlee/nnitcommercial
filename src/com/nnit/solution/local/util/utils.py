@@ -17,6 +17,7 @@ uuid_instance = PrimaryIDGenerator.uuid_generator()
 
 import datetime
 import uuid
+import redis
 
 
 class PrimaryIDGenerator(object):
@@ -24,3 +25,10 @@ class PrimaryIDGenerator(object):
     @staticmethod
     def primary_id_generator():
         return uuid.uuid1(uuid.getnode(), datetime.datetime.now().microsecond)
+
+
+class RedisConnection(object):
+
+    @staticmethod
+    def get_redis_connection(host, port, dbName):
+        return redis.Redis(host=host, port=port, db=dbName)
