@@ -32,3 +32,10 @@ class RedisConnection(object):
     @staticmethod
     def get_redis_connection(host, port, dbName):
         return redis.Redis(host=host, port=port, db=dbName)
+
+
+class SessionGenerator(object):
+
+    @staticmethod
+    def session_generate():
+        return uuid.uuid1(uuid.getnode(), datetime.datetime.now().microsecond)
