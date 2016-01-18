@@ -30,7 +30,21 @@ class ConstantError(TypeError):
         def __init__(self):
             pass
 
-Constant.SEARCHING_DIRECTION_ASC = 'asc'
-Constant.SEARCHING_DIRECTION_DESC = 'desc'
+# 排序方式
+SEARCHING_DIRECTION_ASC = 'asc'
+SEARCHING_DIRECTION_DESC = 'desc'
+
+# Redis的Key的前缀
+SHOP = 'Shop:'
+
+MEMBER = 'Member:'
+MEMBER_CELL_PHONE = 'Member:cellphone'
+FAVORS = 'Favors:'
+COUPON_BACKAGE = 'Couponbackage:'
+INTEGRAL = 'Integral:'
+
+HOT_GROUPONS = 'Hot_Groupons'
+DISCOUNTS_SORT = 'Discounts:discountSort'
+DISCOUNT = 'Discount:'
 
 sys.modules[__name__]=Constant()

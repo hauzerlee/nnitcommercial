@@ -8,7 +8,7 @@
 商家的服务都定义在这个Service中
 """
 import sys
-import com.nnit.solution.local.Constant
+from com.nnit.solution.local import Constant
 
 
 class ShopService(object):
