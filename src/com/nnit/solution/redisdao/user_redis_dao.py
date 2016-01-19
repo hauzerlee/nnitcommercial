@@ -21,13 +21,13 @@ class UserRedisDAO(object):
 
     """
     判断用户的手机号码是否已经被使用
+    这是一个“手机号码”和“用户id”的映射
 
     返回：Integer
     """
     def cell_phone_number_exist(self, cell_phone_number):
-        redis_structure_name = Constant.MEMBER_CELL_PHONE
-        is_exist = redis.sismember(redis_structure_name, cell_phone_number)
-        return is_exist
+        member_id = redis.hget(Constant.MEMBER_CELL_PHONE, cell_phone_number)
+        return member_id
 
     """
     用户登录，把数据存在Redis中。
@@ -37,13 +37,12 @@ class UserRedisDAO(object):
     """
     def login(self, cell_phone_number):
         redis_structure_name = Constant.MEMBER + cell_phone_number
-        is_exist = self.cell_phone_number_exist(cell_phone_number)
-        if is_exist == 0:
+        member_id = self.cell_phone_number_exist(cell_phone_number)
+        if member_id == 0:
             raise UserNotExistException
         # 用户存在，直接放在Redis的对象中
         redis.sadd(redis_structure_name, cell_phone_number)
         return True
-
 
     """
     用户注册使用的方法， 通过一个不定长的参数，来存放用户填入的内容
@@ -62,6 +61,9 @@ class UserRedisDAO(object):
             # TODO(JIAS): SessionId应该一到MySQL的DAO中处理，然后存储到Redis中
             session_id = utils.SessionGenerator.session_generate()
             redis.hmset(redis_structure_name, "SESSION_ID", session_id)
+
+            # 把号码放置到Member:cellphone中，标识此号码已经被注册过了
+            redis.sadd(Constant.MEMBER_CELL_PHONE, cell_phone_number)
 
     """
     更新用户的信息到Redis中
@@ -90,9 +92,30 @@ class UserRedisDAO(object):
 
     返回： 一个list
     """
-    def fetch_favors(self, member_id, quantity_per_page):
+    def fetch_favors_in_range(self, member_id, quantity_per_page):
         redis_structure_name = Constant.FAVORS + member_id
         return redis.srandmember(redis_structure_name, quantity_per_page)
+
+    """
+    提取用户的收藏店铺
+
+    返回：收藏的商铺列表(IDs)
+    """
+    def fetch_favors(self, member_id):
+        redis_structure_name = Constant.FAVORS + member_id
+        return redis.smembers(redis_structure_name)
+
+    """
+    删除收藏
+
+    返回：无
+    """
+    def remove_favor(self, member_id, shop_id):
+        redis_structure_name = Constant.FAVORS + member_id
+        has_this_favor = redis.SISMEMBER(redis_structure_name, shop_id)
+        if has_this_favor == 1:
+            # 从用户自己的队列中删除收藏的shop id
+            redis.SREM(redis_structure_name, shop_id)
 
     """
     提取用户的优惠券
@@ -104,13 +127,17 @@ class UserRedisDAO(object):
         return redis.smembers(redis_structure_name)
 
     """
-    提取用户的收藏店铺
+    使用一个coupon，直接从用户的redis列表中删除
 
-    返回：收藏的商铺列表(IDs)
+    返回： 无
     """
-    def fetch_favors(self, member_id):
-        redis_structure_name = Constant.FAVORS + member_id
-        return redis.smembers(redis_structure_name)
+    def use_coupon(self, member_id, coupon_id):
+        redis_structure_name = Constant.COUPON_BACKAGE + member_id
+        has_this_coupon = redis.SISMEMBER(redis_structure_name, coupon_id)
+        if has_this_coupon == 1:
+            # 从用户自己的队列中删除已经使用的Coupon Id
+            redis.SREM(redis_structure_name, coupon_id)
+
 
 
 class UserNotExistException(object):

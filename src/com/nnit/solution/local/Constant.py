@@ -35,6 +35,10 @@ SEARCHING_DIRECTION_ASC = 'asc'
 SEARCHING_DIRECTION_DESC = 'desc'
 
 # Redis的Key的前缀
+COLON = ":"
+
+LONIN_MEMBERS = 'Login:members'
+
 SHOP = 'Shop:'
 
 MEMBER = 'Member:'
