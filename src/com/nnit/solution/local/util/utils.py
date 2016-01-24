@@ -30,7 +30,7 @@ class PrimaryIDGenerator(object):
 class RedisConnection(object):
 
     @staticmethod
-    def get_redis_connection(host, port, dbName):
+    def get_redis_connection(host='localhost', port=6379, dbName=0):
         return redis.Redis(host=host, port=port, db=dbName)
 
 
@@ -60,10 +60,11 @@ class SortedValueGenerator(object):
         2. 根据不同的折扣类型，换算成同一个的一个值
            例如：1. 5折， 变成 5000 （所有折扣，根据折扣值，再乘以1000）
                 2. 满一百减20， 变成 200 （满多少减多少， 根据减的数值，乘以10）
+    当前，先支持第一种方式。其他中方式等日后有时间再继续
 
     :param discount_value  : 折扣数量
     :param discount_type   : 折扣类型
     """
     @staticmethod
-    def generate_discount_value(discount_value, discount_type):
+    def generate_discount_value(discount_original_value, discount_type):
         pass
