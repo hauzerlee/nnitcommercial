@@ -18,13 +18,18 @@ uuid_instance = PrimaryIDGenerator.uuid_generator()
 import datetime
 import uuid
 import redis
+import shortuuid
+from com.nnit.solution.local import Constant
 
 
 class PrimaryIDGenerator(object):
 
     @staticmethod
     def primary_id_generator():
-        return uuid.uuid1(uuid.getnode(), datetime.datetime.now().microsecond)
+        """
+        数据库表的主键生成器
+        """
+        return str(shortuuid.uuid(Constant.UUID_SEED))
 
 
 class RedisConnection(object):

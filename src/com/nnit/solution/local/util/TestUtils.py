@@ -9,7 +9,9 @@ The tester for utils.py
 """
 
 import unittest
+import shortuuid
 from com.nnit.solution.local.util import utils
+from com.nnit.solution.local import Constant
 
 
 class TestPrimaryIDGenerator(unittest.TestCase):
@@ -25,7 +27,7 @@ class TestPrimaryIDGenerator(unittest.TestCase):
     '''
     def test_primary_id_generator(self):
         uuid_str = utils.PrimaryIDGenerator.primary_id_generator()
-        print("uuid is %s" % uuid_str)
+        print("first  uuid is %s" % uuid_str)
         self.assertIsNotNone(uuid_str,'Generate UUID failed.')
 
     '''

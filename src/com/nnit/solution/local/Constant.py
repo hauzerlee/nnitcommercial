@@ -10,6 +10,10 @@
 
 import sys
 
+#UUID生成的种子
+UUID_SEED = 'http://www.nnit.com/local'
+
+
 # 排序方式
 SEARCHING_DIRECTION_ASC = 'asc'
 SEARCHING_DIRECTION_DESC = 'desc'
@@ -23,6 +27,7 @@ SHOP = 'Shop:'
 
 MEMBER = 'Member:'
 MEMBER_CELL_PHONE = 'Member:cellphone'
+MEMBER_USED_CELL_PHONE = 'Member:used_cellphone'
 FAVORS = 'Favors:'
 COUPON_BACKAGE = 'Couponbackage:'
 INTEGRAL = 'Integral:'

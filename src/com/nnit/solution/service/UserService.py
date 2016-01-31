@@ -29,8 +29,9 @@ class UserService(object):
 
     返回：用户的个人信息
     """
-    def login(self, cell_phone_num, password):
-        pass
+    def login(self, cell_phone_num, password=123456):
+        return user_redis_dao.UserRedisDAO.login(cell_phone_num)
+
 
     """
     这个方法适用于用户没有从APP中登出，在APP中存在一个
