@@ -25,6 +25,10 @@ LONIN_MEMBERS = 'Login:members'
 
 SHOP = 'Shop:'
 
+#提取商铺的方式
+FETCH_SHOP_TYPE_DEFAULT='GRADE' # 评分排序方式
+FETCH_SHOP_TYPE_JOIN_DATE = "JOINED_DATE" # 根据商铺加入方式
+
 MEMBER = 'Member:'
 MEMBER_CELL_PHONE = 'Member:cellphone'
 MEMBER_USED_CELL_PHONE = 'Member:used_cellphone'

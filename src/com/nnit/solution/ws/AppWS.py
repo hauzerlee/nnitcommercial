@@ -34,6 +34,16 @@ class niubi(tornado.web.RequestHandler):
     def get(self, story_id):
         self.write("xiaorui.cc niubi'id is " + story_id)
 
+
+"""
+shoppingmall的RESTful接口
+"""
+class shoppingmall(tornado.web.RequestHandler):
+
+    @get(_path="/shops",shops=mediatypes.APPLICATION_JSON)
+    def fetchHotShops(self, shops):
+        pass;
+
 """
 用户登录
 """
@@ -66,6 +76,7 @@ if __name__ == "__main__":
     application = tornado.web.Application([
         (r"/", WSHandler),
         (r"/niubi/([0-9]+)", niubi),
+        (r"/shoppingmall/shops")
     ])
     http_server = tornado.httpserver.HTTPServer(application)
     http_server.listen(options.port)
