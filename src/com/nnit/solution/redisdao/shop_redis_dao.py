@@ -81,8 +81,7 @@ class ShopRedisDAO(object):
         for id in shop_ids:
             r_key = Constant.SHOP + ":" + id
             shops_list.append(json.dump(self.redis.hgetall(r_key)))
-        shops_map = {'shops':shops_list}
-        return json.dump(shops_map)
+        return json.dump(shops_list)
 
 
     # -----------------------------------------------------------------------
