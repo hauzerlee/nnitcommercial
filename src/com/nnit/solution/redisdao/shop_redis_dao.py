@@ -35,7 +35,7 @@ class ShopRedisDAO(object):
         if shop_obj is not None:
             shop = shop_obj
 
-        redis_key = Constant.SHOP + ":" + shop.ID
+        redis_key = Constant.SHOP + Constant.COLON + shop.ID
         shop_mapping = {"ID":shop.ID, "SHOP_NAME":shop.name, "FLOOR": shop.floor,
                         "LOCATION":shop.location, "LOGO":shop.logo, "TRUE_SCENE":shop.true_scene,
                         "TELEPHONE":shop.telephone, "CONTACT":shop.contact, "CONTACT_TEL":shop.contact_tel,
@@ -46,10 +46,10 @@ class ShopRedisDAO(object):
 
         #把商铺放到2个zset中（暂时只有2个），用于提取商品列表
         # score
-        redis_key = Constant.SHOP + ":" + Constant.FETCH_SHOP_TYPE_DEFAULT
+        redis_key = Constant.SHOP + Constant.COLON + Constant.FETCH_SHOP_TYPE_DEFAULT
         self.redis.zadd(redis_key,shop.ID, 3) # 默认给3分
         # join_date
-        redis_key = Constant.SHOP + ":" + Constant.FETCH_SHOP_TYPE_DEFAULT
+        redis_key = Constant.SHOP + Constant.COLON + Constant.FETCH_SHOP_TYPE_DEFAULT
         self.redis.zadd(redis_key,shop.ID, utils.getDatetToLong())
 
 
@@ -60,7 +60,7 @@ class ShopRedisDAO(object):
         :param shop_id:  店铺的ID
         """
         if shop_id.strip(): # 如果shop_id不为空
-            redis_key = Constant.SHOP + ":" + shop_id
+            redis_key = Constant.SHOP + Constant.COLON + shop_id
             return json.dump(self.redis.hgetall(redis_key))
         else:
             return "{}"
@@ -79,9 +79,10 @@ class ShopRedisDAO(object):
         # 遍历每个id，提取每个shop的详细信息，并放到一个json里
         shops_list = []
         for id in shop_ids:
-            r_key = Constant.SHOP + ":" + id
+            r_key = Constant.SHOP + Constant.COLON + id
             shops_list.append(json.dump(self.redis.hgetall(r_key)))
-        return json.dump(shops_list)
+        shops = {Constant.JSON_HEAD_SHOPS:shops_list}
+        return json.dump(shops)
 
 
     # -----------------------------------------------------------------------
@@ -116,7 +117,7 @@ class ShopRedisDAO(object):
         for production_id in discount_ids_map:
             """ 创建一个折扣的redis对象 """
             """ key是 Discount:discountId """
-            redis_key_discount = Constant.DISCOUNT + discount_ids_map[production_id]
+            redis_key_discount = Constant.DISCOUNT + Constant.COLON + discount_ids_map[production_id]
             self.redis.hmset(redis_key_discount, production_id, discount_values_map[production_id])
 
             """ 放到公共的redis折扣列表里 """

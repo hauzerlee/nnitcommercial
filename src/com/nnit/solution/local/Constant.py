@@ -23,19 +23,26 @@ COLON = ":"
 
 LONIN_MEMBERS = 'Login:members'
 
-SHOP = 'Shop:'
+SHOP = 'Shop'
 
 #提取商铺的方式
 FETCH_SHOP_TYPE_DEFAULT='GRADE' # 评分排序方式
 FETCH_SHOP_TYPE_JOIN_DATE = "JOINED_DATE" # 根据商铺加入方式
 
-MEMBER = 'Member:'
+MEMBER = 'Member'
 MEMBER_CELL_PHONE = 'Member:cellphone'
 MEMBER_USED_CELL_PHONE = 'Member:used_cellphone'
-FAVORS = 'Favors:'
-COUPON_BACKAGE = 'Couponbackage:'
-INTEGRAL = 'Integral:'
+FAVORS = 'Favors'
+COUPON_BACKAGE = 'Couponbackage'
+INTEGRAL = 'Integral'
 
 HOT_GROUPONS = 'Hot_Groupons'
 DISCOUNTS_SORT = 'Discounts:discountSort'
-DISCOUNT = 'Discount:'
+DISCOUNT = 'Discount'
+
+#JSON列表的key
+JSON_HEAD_SHOPS = "shops"
+JSON_HEAD_DISCOUNTS = "discounts"
+JSON_HEAD_PRODUCTS = "products"
+JSON_HEAD_GROUPS = "groups"
+JSON_HEAD_TRXS = "trx"
