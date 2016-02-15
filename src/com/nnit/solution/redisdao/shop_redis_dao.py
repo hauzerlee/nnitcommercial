@@ -89,6 +89,17 @@ class ShopRedisDAO(object):
     # 商户发布信息的方法
     # -----------------------------------------------------------------------
 
+    def create_groupon(self, shop_id, groupon, groupon_json=""):
+        if (groupon_json != "" and groupon == None):
+            groupon = json.load(groupon_json)
+        # 采用groupon来操作
+        redis_key_discount = Constant.GROUPON + Constant.COLON + utils.PrimaryIDGenerator.primary_id_generator()
+        groupon_mapping = {"ID":groupon.ID, "SHOP_ID":groupon.shop_id, "TITLE":groupon.title, "PICTURE":groupon.picture,
+                           "ORIGINAL_PRICE":groupon.original_price,"CURRENT_PRICE":groupon.current_price,
+                           "START_TIME":groupon.start_time, "END_TIME":groupon.end_time,
+                           "DETAILS":groupon.details,"CREATE_TIME":groupon.create_time}
+        self.redis.hmset(redis_key_discount, groupon_mapping)
+
 
     def publish_groupons(self, shop_id, groupon_ids):
         """

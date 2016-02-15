@@ -37,6 +37,7 @@ COUPON_BACKAGE = 'Couponbackage'
 INTEGRAL = 'Integral'
 
 HOT_GROUPONS = 'Hot_Groupons'
+GROUPON = 'Groupon'
 DISCOUNTS_SORT = 'Discounts:discountSort'
 DISCOUNT = 'Discount'
 
