@@ -6,9 +6,11 @@
 
 
 import unittest
+import json
 from com.nnit.solution.local.util import utils
 from com.nnit.solution.local import Constant
 from com.nnit.solution.redisdao import shop_redis_dao
+from com.nnit.solution.entity import entitys
 
 
 class TestShopRedisDAO(unittest.TestCase):
@@ -56,3 +58,15 @@ class TestShopRedisDAO(unittest.TestCase):
             print(id_score)
         print("-------------------------")
         self.redis.zrem(Constant.DISCOUNTS_SORT, 1, 2, 3)
+
+    def test_create_groupon(self):
+        """
+        测试创建一个团购
+        :return:
+        """
+        groupon_json = "{ID:12345, SHOP_ID:23456, TITLE:TEST_GROUPON, PICTURE:HTTP://WWW.ABC.IO/PIC1.JPGE," \
+                       " ORIGINAL_PRICE:100.00, CURRENT_PRICE:50.00, START_TIME:9:00, END_TIME:19:00, DETAILS:THIS IS A TESTING GROUPON, " \
+                       " CREATE_TIME:2016-01-01 12:32:23}"
+        groupon = json.loads(groupon_json, object_hook = utils.dict2object)
+        print(groupon)
+        print(groupon.SHOP_ID)

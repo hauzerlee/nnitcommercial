@@ -1,7 +1,7 @@
 from django.db import models
 from com.nnit.solution.local.util import utils
 
-
+"""
 class Member(models.Model):
     ID = models.UUIDField
     cell_phone = models.CharField(max_length=15)
@@ -23,3 +23,17 @@ class Member(models.Model):
         primary_id = utils.PrimaryIDGenerator.primary_id_generator();
         member = cls(cell_phone=cell_phone, password=password, ID=primary_id)
         return member
+"""
+
+class Groupon(object):
+    id=''
+    shop_id=''
+    title=''
+    picture=''
+    original_price=0.00
+    current_price=0.00
+    start_time=None
+    end_time=None
+    details=''
+    create_time=None
+
