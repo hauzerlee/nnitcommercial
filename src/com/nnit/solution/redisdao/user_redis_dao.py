@@ -8,18 +8,20 @@
 和用户相关的操作，都定义在这个dao中
 """
 
-import redis
 import json
+from urllib.parse import parse_qs
+
+import redis
+
 from com.nnit.solution.entity import entitys
-from com.nnit.solution.local.util import utils
 from com.nnit.solution.local import Constant
+from com.nnit.solution.local.util import utils
 
 
 class UserRedisDAO(object):
     def __init__(self):
         # get the redis connection
         self.redis = utils.RedisConnection.get_redis_connection()
-
 
     def cell_phone_number_exist(self, cell_phone_number):
         """
@@ -30,7 +32,6 @@ class UserRedisDAO(object):
         """
         is_exist = self.redis.sismember(Constant.MEMBER_USED_CELL_PHONE, cell_phone_number)
         return is_exist
-
 
     def login(self, cell_phone_number):
         """
@@ -49,6 +50,17 @@ class UserRedisDAO(object):
         self.redis.hmset(key_name, {'SESSION_ID': session_id})
         return True
 
+    def getMemberInfo(self, member_id):
+        """
+        返回APP用户的个人信息
+        :param member_id: APP用户的ID
+        :return: 用户的个人信息 (dict)
+        """
+        member = self.redis.hgetall(Constant.MEMBER + Constant.COLON + member_id)
+        result={}
+        for (key,value) in member.items():
+            result[key.decode('utf-8')] = value.decode('utf-8')
+        return result # 应该是一个Map
 
     def enrol(self, cell_phone_number, pwd):
         """
@@ -73,21 +85,20 @@ class UserRedisDAO(object):
             self.redis.hset(Constant.MEMBER_CELL_PHONE, cell_phone_number, member.session_id)
             self.redis.sadd(Constant.MEMBER_USED_CELL_PHONE, cell_phone_number)
 
-
     def update_user(self, member):
         """
         更新用户的信息到Redis中
         :param  member: 用户对象
         """
         redis_structure_name = Constant.MEMBER + Constant.COLON + member.ID
-        member_value = {"ID":member.ID, "CELL_PHONE":member.cell_phone, "NICK_NAME":member.nick_name,
-                        "PASSWORD":member.password, "SESSION_ID":member.session_id, "LASTEST_LOGIN":member.lastest_login,
-                        "ACCOUNT_NUMBER":member.account_number, "GRADE":member.grade, "STATUS":member.status,
-                        "IS_ONLINE":member.is_online, "GENDER":member.gender, "PIC":member.pic,
-                        "EMAIL_ADDR":member.email_addr, "TYPE":member.type}
+        member_value = {"ID": member.ID, "CELL_PHONE": member.cell_phone, "NICK_NAME": member.nick_name,
+                        "PASSWORD": member.password, "SESSION_ID": member.session_id,
+                        "LASTEST_LOGIN": member.lastest_login,
+                        "ACCOUNT_NUMBER": member.account_number, "GRADE": member.grade, "STATUS": member.status,
+                        "IS_ONLINE": member.is_online, "GENDER": member.gender, "PIC": member.pic,
+                        "EMAIL_ADDR": member.email_addr, "TYPE": member.type}
         # update the session id
         redis.hset(redis_structure_name, member_value)
-
 
     def add_favor(self, member_id, shop_id):
         """
@@ -106,16 +117,15 @@ class UserRedisDAO(object):
         :return 收藏的店铺列表
         """
         redis_structure_name = Constant.FAVORS + Constant.COLON + member_id
-        shop_ids = redis.smembers(redis_structure_name) # 得到收藏的店铺id列表
+        shop_ids = redis.smembers(redis_structure_name)  # 得到收藏的店铺id列表
         shops = []
         index = 0
-        #开始提取店铺的详细信息
+        # 开始提取店铺的详细信息
         for shop_id in shop_ids:
             shops.insert(index, json.dump(self.redis.hgetall(Constant.SHOP + Constant.COLON + shop_id)))
             index += 1
-        shops_map = {Constant.JSON_HEAD_SHOPS : shops}
+        shops_map = {Constant.JSON_HEAD_SHOPS: shops}
         return json.dump(shops_map)
-
 
     def fetch_favors_in_range(self, member_id, quantity_per_page):
         """
@@ -128,11 +138,11 @@ class UserRedisDAO(object):
         shop_ids = redis.srandmember(redis_structure_name, quantity_per_page)
         shops = []
         index = 0
-        #开始提取店铺的详细信息
+        # 开始提取店铺的详细信息
         for shop_id in shop_ids:
             shops.insert(index, json.dump(self.redis.hgetall(Constant.SHOP + Constant.COLON + shop_id)))
             index += 1
-        shops_map = {Constant.JSON_HEAD_SHOPS : shops}
+        shops_map = {Constant.JSON_HEAD_SHOPS: shops}
         return json.dump(shops_map)
 
     def remove_favor(self, member_id, shop_id):
@@ -142,7 +152,7 @@ class UserRedisDAO(object):
         :param shop_id
         :return 无
         """
-        redis_structure_name = Constant.FAVORS + Constant.COLON +  member_id
+        redis_structure_name = Constant.FAVORS + Constant.COLON + member_id
         has_this_favor = redis.SISMEMBER(redis_structure_name, shop_id)
         if has_this_favor == 1:
             # 从用户自己的队列中删除收藏的shop id
