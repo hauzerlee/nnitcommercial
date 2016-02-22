@@ -7,39 +7,18 @@
 """
 APP、 后台管理系统，与用户相关的操作，都定义在这个Service中
 """
-import json
-import string
+import datetime
 
 import pyrestful.rest
 import tornado.web
 from pyrestful import mediatypes
 from pyrestful.rest import get
+from pyrestful.rest import post
 
 from com.nnit.solution.local.util import utils
 from com.nnit.solution.redisdao import user_redis_dao
 
-
-class Login(pyrestful.rest.RestHandler):
-    def post(self):
-        res = login(json.loads(self.request.body))
-
-
-def login(cell_phone_num, password=123456):
-    """
-    这个方法适用于用户已经重手机端登出，
-    APP需要用户提供预设密码
-    先看Redis中是否有对应的对象，
-    如果有，直接从Redis中
-    返回用户的信息，并生成新的SessionId，更新redis数据
-    如果没有，从MySQL中提取数据，
-    并更新redis的数据
-
-    返回：用户的个人信息
-    """
-    return user_redis_dao.UserRedisDAO.login(cell_phone_num)
-
-
-class GetMemberInfo(pyrestful.rest.RestHandler):
+class MemberServices(pyrestful.rest.RestHandler):
     """
     返回用户的个人信息
     """
@@ -49,35 +28,67 @@ class GetMemberInfo(pyrestful.rest.RestHandler):
         user_reids_dao = user_redis_dao.UserRedisDAO()
         return user_reids_dao.getMemberInfo(member_id)
 
+    # REST-POST
+    @post(_path="", _produces=mediatypes.APPLICATION_JSON)
+    def login(self, cell_phone_num):
+        """
+        这个方法适用于用户已经重手机端登出，
+        APP需要用户提供预设密码
+        先看Redis中是否有对应的对象，
+        如果有，直接从Redis中
+        返回用户的信息，并生成新的SessionId，更新redis数据
+        如果没有，从MySQL中提取数据，
+        并更新redis的数据
 
-def login_directly(self, cell_phone_num, session_id):
-    """
-    这个方法适用于用户没有从APP中登出，在APP中存在一个
-    上次登录时的SessionID
-    登录逻辑同login()方法基本相同。
-    唯一的不同，就是不需要验证用户的密码，而是去验证用户
-    上次登录时生成的SessionId
+        返回：用户的个人信息
+        """
+        return user_redis_dao.UserRedisDAO.login(cell_phone_num)
 
-    返回：用户的个人信息
-    """
-    try:
-        isEnrol = user_redis_dao.UserRedisDAO.login(cell_phone_num)
-        if isEnrol:
-            new_session_id = utils.SessionGenerator.session_generate()
-            user = user_redis_dao.UserRedisDAO.get_user_by_phone_number(cell_phone_num)
-            if session_id == user.get_session_id():  # 用户终端存在sessionId，没有”登出“
-                user.set_session_id(new_session_id)
-                user_redis_dao.UserRedisDAO.update_user(user)  # update in redis
-                # --------------------------------------
-                # TODO(JIAS): 更新MySQL中用户的sessionId
-                # --------------------------------------
+    # REST-POST
+    @post(_path="/shoppingmall/members/enrol", _types=[bytes,bytes], _produces=mediatypes.APPLICATION_JSON)
+    def enrol(self, cell_phone_num, password):
+        enrol_result = {}
+        enrol_result["status"]="false"
+        enrol_result["memberId"] = ""
+        enrol_result["sessionId"] = ""
+        if (cell_phone_num is not None):
+            user_reids_dao = user_redis_dao.UserRedisDAO()
+            result = user_reids_dao.enrol(cell_phone_num,password)
+            if result:
+                enrol_result["status"]="true"
+                enrol_result["memberId"] = result[0]
+                enrol_result["sessionId"] = result[1]
+        return enrol_result
 
-            return user  # 返回用户对象
-        else:
-            return  # 没有注册过；或者已经“登出”
-    except user_redis_dao.UserNotExistException:
-        print('User NOT Exist Exception')
 
+    # REST-POST
+    @post(_path="", _produces=mediatypes.APPLICATION_JSON)
+    def login_directly(self, cell_phone_num, session_id):
+        """
+        这个方法适用于用户没有从APP中登出，在APP中存在一个
+        上次登录时的SessionID
+        登录逻辑同login()方法基本相同。
+        唯一的不同，就是不需要验证用户的密码，而是去验证用户
+        上次登录时生成的SessionId
+
+        返回：用户的个人信息
+        """
+        try:
+            isEnrol = user_redis_dao.UserRedisDAO.login(cell_phone_num)
+            if isEnrol:
+                new_session_id = utils.SessionGenerator.session_generate()
+                user = user_redis_dao.UserRedisDAO.get_user_by_phone_number(cell_phone_num)
+                if session_id == user.get_session_id():  # 用户终端存在sessionId，没有”登出“
+                    user.set_session_id(new_session_id)
+                    user_redis_dao.UserRedisDAO.update_user(user)  # update in redis
+                    # --------------------------------------
+                    # TODO(JIAS): 更新MySQL中用户的sessionId
+                    # --------------------------------------
+                    return user  # 返回用户对象
+                else:
+                    return  # 没有注册过；或者已经“登出”
+        except user_redis_dao.UserNotExistException:
+            print('User NOT Exist Exception')
 
 """
 通过用户的UUID来提取优惠券

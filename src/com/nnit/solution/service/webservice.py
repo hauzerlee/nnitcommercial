@@ -15,7 +15,7 @@ from com.nnit.solution.service import UserService
 
 # a list to route different REST Service.
 restservices = []
-restservices.append(UserService.GetMemberInfo)
+restservices.append(UserService.MemberServices)
 if __name__ == "__main__":
 
     try:

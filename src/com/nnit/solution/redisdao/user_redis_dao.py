@@ -69,6 +69,7 @@ class UserRedisDAO(object):
         :param pwd 用户密码
         :return 用户注册的个人信息
         """
+        enrol_result=[]
         # not exist the cell phone, can go on enrol
         is_exist = self.cell_phone_number_exist(cell_phone_number)
         if is_exist != 0:
@@ -84,6 +85,8 @@ class UserRedisDAO(object):
             # 把号码放置到Member:cellphone中，标识此号码已经被注册过了
             self.redis.hset(Constant.MEMBER_CELL_PHONE, cell_phone_number, member.session_id)
             self.redis.sadd(Constant.MEMBER_USED_CELL_PHONE, cell_phone_number)
+            enrol_result.append(member.ID,session_id)
+        return enrol_result
 
     def update_user(self, member):
         """
