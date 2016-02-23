@@ -9,11 +9,9 @@
 """
 
 import json
-from urllib.parse import parse_qs
 
 import redis
 
-from com.nnit.solution.entity import entitys
 from com.nnit.solution.local import Constant
 from com.nnit.solution.local.util import utils
 
@@ -57,10 +55,10 @@ class UserRedisDAO(object):
         :return: 用户的个人信息 (dict)
         """
         member = self.redis.hgetall(Constant.MEMBER + Constant.COLON + member_id)
-        result={}
-        for (key,value) in member.items():
+        result = {}
+        for (key, value) in member.items():
             result[key.decode('utf-8')] = value.decode('utf-8')
-        return result # 应该是一个Map
+        return result  # 应该是一个Map
 
     def enrol(self, cell_phone_number, pwd):
         """
@@ -69,23 +67,25 @@ class UserRedisDAO(object):
         :param pwd 用户密码
         :return 用户注册的个人信息
         """
-        enrol_result=[]
+        enrol_result = []
         # not exist the cell phone, can go on enrol
         is_exist = self.cell_phone_number_exist(cell_phone_number)
         if is_exist != 0:
             # Generate the member's primary ID
-            member = entitys.Member.create(cell_phone_number, password=pwd)
+            # member = entitys.Member.create(cell_phone_number, password=pwd)
+            member_id = utils.PrimaryIDGenerator.primary_id_generator()
             # TODO(JIAS): put the new user object into 'Member:memberId' redis object
-            redis_structure_name = Constant.MEMBER + Constant.COLON + member.ID
+            redis_structure_name = Constant.MEMBER + Constant.COLON + member_id
             # TODO(JIAS): SessionId应该一到MySQL的DAO中处理，然后存储到Redis中
             session_id = utils.SessionGenerator.session_generate()
-            values = {'CELL_PHONE': cell_phone_number, 'PASSWORD': pwd, 'ID': member.ID, 'SESSION_ID': session_id}
+            values = {'CELL_PHONE': cell_phone_number, 'PASSWORD': pwd, 'ID': member_id, 'SESSION_ID': session_id}
             self.redis.hmset(redis_structure_name, values)
 
             # 把号码放置到Member:cellphone中，标识此号码已经被注册过了
-            self.redis.hset(Constant.MEMBER_CELL_PHONE, cell_phone_number, member.session_id)
+            self.redis.hset(Constant.MEMBER_CELL_PHONE, cell_phone_number, member_id)
             self.redis.sadd(Constant.MEMBER_USED_CELL_PHONE, cell_phone_number)
-            enrol_result.append(member.ID,session_id)
+            enrol_result.append(member_id)
+            enrol_result.append(str(session_id))
         return enrol_result
 
     def update_user(self, member):

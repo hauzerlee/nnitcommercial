@@ -1,5 +1,4 @@
 import unittest
-from urllib.parse import parse_qs
 
 from com.nnit.solution.redisdao import user_redis_dao
 

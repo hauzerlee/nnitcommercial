@@ -7,10 +7,8 @@
 """
 APP、 后台管理系统，与用户相关的操作，都定义在这个Service中
 """
-import datetime
 
 import pyrestful.rest
-import tornado.web
 from pyrestful import mediatypes
 from pyrestful.rest import get
 from pyrestful.rest import post
@@ -18,15 +16,17 @@ from pyrestful.rest import post
 from com.nnit.solution.local.util import utils
 from com.nnit.solution.redisdao import user_redis_dao
 
+
 class MemberServices(pyrestful.rest.RestHandler):
     """
     返回用户的个人信息
     """
+
     # REST-GET
     @get(_path="/shoppingmall/members/{member_id}", _produces=mediatypes.APPLICATION_JSON)
     def get_member_info(self, member_id):
-        user_reids_dao = user_redis_dao.UserRedisDAO()
-        return user_reids_dao.getMemberInfo(member_id)
+        redis_dao = user_redis_dao.UserRedisDAO()
+        return redis_dao.getMemberInfo(member_id)
 
     # REST-POST
     @post(_path="", _produces=mediatypes.APPLICATION_JSON)
@@ -45,21 +45,22 @@ class MemberServices(pyrestful.rest.RestHandler):
         return user_redis_dao.UserRedisDAO.login(cell_phone_num)
 
     # REST-POST
-    @post(_path="/shoppingmall/members/enrol", _types=[bytes,bytes], _produces=mediatypes.APPLICATION_JSON)
+    @post(_path="/shoppingmall/members/enrol", _types=[bytes, bytes], _produces=mediatypes.APPLICATION_JSON)
     def enrol(self, cell_phone_num, password):
-        enrol_result = {}
-        enrol_result["status"]="false"
-        enrol_result["memberId"] = ""
-        enrol_result["sessionId"] = ""
-        if (cell_phone_num is not None):
-            user_reids_dao = user_redis_dao.UserRedisDAO()
-            result = user_reids_dao.enrol(cell_phone_num,password)
+        print("cell_phone_num -> " + cell_phone_num)
+        enrol_result = {"status":False, "memberId":'', "sessionId":''}
+        # enrol_result["status"] = False
+        # enrol_result["memberId"] = ""
+        # enrol_result["sessionId"] = ""
+        if cell_phone_num is not None:
+            redis_dao = user_redis_dao.UserRedisDAO()
+            result = redis_dao.enrol(cell_phone_num, password)
             if result:
-                enrol_result["status"]="true"
-                enrol_result["memberId"] = result[0]
-                enrol_result["sessionId"] = result[1]
+                # enrol_result["status"] = True
+                # enrol_result["memberId"] = result[0]
+                # enrol_result["sessionId"] = result[1]
+                enrol_result = {"status":True, "memberId":result[0], "sessionId": result[1]}
         return enrol_result
-
 
     # REST-POST
     @post(_path="", _produces=mediatypes.APPLICATION_JSON)
@@ -89,6 +90,7 @@ class MemberServices(pyrestful.rest.RestHandler):
                     return  # 没有注册过；或者已经“登出”
         except user_redis_dao.UserNotExistException:
             print('User NOT Exist Exception')
+
 
 """
 通过用户的UUID来提取优惠券
@@ -211,12 +213,11 @@ def new_msgs(self, member_id):
     redis_key = "Message:" + member_id
     return self.redis.smember(redis_key)
 
-
-application = tornado.web.Application([
-    (r"/shoppingmall", Login),
-    (r"/shoppingmall/members/([a-zA-Z0-9_])+", GetMemberInfo)
-])
-
-if __name__ == "__main__":
-    application.listen(8888)
-    tornado.ioloop.IOLoop.instance().start()
+# application = tornado.web.Application([
+#     (r"/shoppingmall", MemberServices)
+#     # (r"/shoppingmall/members/([a-zA-Z0-9_])+", GetMemberInfo)
+# ])
+#
+# if __name__ == "__main__":
+#     application.listen(8888)
+#     tornado.ioloop.IOLoop.instance().start()
