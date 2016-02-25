@@ -36,17 +36,23 @@ class UserRedisDAO(object):
         用户登录，把数据存在Redis中。
         方法要么返回True，要么抛出用户不存在异常
         :param cell_phone_number: 用户手机号码
-        :return True或者False
+        :return 一个json字符串
         """
+        return_result = []
         is_exist = self.cell_phone_number_exist(cell_phone_number)
         if is_exist == 0:
-            raise UserNotExistException
+            return_result.append("memberid:")
+            return_result.append("session_id:")
+            return return_result
         member_id = self.redis.hget(Constant.MEMBER_CELL_PHONE, cell_phone_number)
         # 用户存在，直接放在Redis的对象中
         session_id = utils.SessionGenerator.session_generate()
         key_name = Constant.MEMBER + Constant.COLON + member_id.decode('utf-8')
-        self.redis.hmset(key_name, {'SESSION_ID': session_id})
-        return True
+        self.redis.hmset(key_name, {'SESSION_ID': str(session_id)})
+        return_result = []
+        return_result.append("memberid:"+ member_id)
+        return_result.append("session_id:" + session_id)
+        return return_result
 
     def getMemberInfo(self, member_id):
         """
@@ -70,7 +76,9 @@ class UserRedisDAO(object):
         enrol_result = []
         # not exist the cell phone, can go on enrol
         is_exist = self.cell_phone_number_exist(cell_phone_number)
-        if is_exist != 0:
+        if is_exist:
+            return enrol_result
+        else:
             # Generate the member's primary ID
             # member = entitys.Member.create(cell_phone_number, password=pwd)
             member_id = utils.PrimaryIDGenerator.primary_id_generator()
@@ -86,7 +94,7 @@ class UserRedisDAO(object):
             self.redis.sadd(Constant.MEMBER_USED_CELL_PHONE, cell_phone_number)
             enrol_result.append(member_id)
             enrol_result.append(str(session_id))
-        return enrol_result
+            return enrol_result
 
     def update_user(self, member):
         """

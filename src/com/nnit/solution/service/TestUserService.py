@@ -13,7 +13,7 @@ class TestUserService(unittest.TestCase):
         pass
 
     def test_enrol(self):
-        cell_phone_num = "13612077384"
+        cell_phone_num = "13612077387"
         password = "123456"
         params = urllib.urlencode({'cell_phone_num':cell_phone_num, 'password':password})
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
@@ -27,3 +27,18 @@ class TestUserService(unittest.TestCase):
             print(json_data)
         else:
             print(data)
+
+    # def test_login(self):
+    #     cell_phone_num = "13612077384"
+    #     params = urllib.urlencode({'cell_phone_num':cell_phone_num})
+    #     headers = {"Content-Type": "application/x-www-form-urlencoded"}
+    #     conn = httplib.HTTPConnection("localhost:8888")
+    #     conn.request('POST', '/shoppingmall/members/login', params, headers)
+    #
+    #     resp = conn.getresponse()
+    #     data = resp.read()
+    #     if resp.status == 200:
+    #         json_data = json.loads(data.decode('utf-8'))
+    #         print(json_data)
+    #     else:
+    #         print(data)

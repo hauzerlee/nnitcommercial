@@ -29,7 +29,7 @@ class MemberServices(pyrestful.rest.RestHandler):
         return redis_dao.getMemberInfo(member_id)
 
     # REST-POST
-    @post(_path="", _produces=mediatypes.APPLICATION_JSON)
+    @post(_path="/shoppingmall/members/login", _types=[bytes], _produces=mediatypes.APPLICATION_JSON)
     def login(self, cell_phone_num):
         """
         这个方法适用于用户已经重手机端登出，
@@ -42,6 +42,7 @@ class MemberServices(pyrestful.rest.RestHandler):
 
         返回：用户的个人信息
         """
+        print("cell_phone_num -> " + cell_phone_num)
         return user_redis_dao.UserRedisDAO.login(cell_phone_num)
 
     # REST-POST
@@ -213,11 +214,3 @@ def new_msgs(self, member_id):
     redis_key = "Message:" + member_id
     return self.redis.smember(redis_key)
 
-# application = tornado.web.Application([
-#     (r"/shoppingmall", MemberServices)
-#     # (r"/shoppingmall/members/([a-zA-Z0-9_])+", GetMemberInfo)
-# ])
-#
-# if __name__ == "__main__":
-#     application.listen(8888)
-#     tornado.ioloop.IOLoop.instance().start()
