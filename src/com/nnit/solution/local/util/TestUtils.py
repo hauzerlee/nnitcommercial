@@ -26,9 +26,10 @@ class TestPrimaryIDGenerator(unittest.TestCase):
     Test the primary id generate for MySQL Primary ID
     '''
     def test_primary_id_generator(self):
-        uuid_str = utils.PrimaryIDGenerator.primary_id_generator()
-        print("first  uuid is %s" % uuid_str)
-        self.assertIsNotNone(uuid_str,'Generate UUID failed.')
+        for i in range(1,100):
+            uuid_str = utils.PrimaryIDGenerator.primary_id_generator()
+            print("first  uuid is %s" % uuid_str)
+            self.assertIsNotNone(uuid_str,'Generate UUID failed.')
 
     '''
     Test the connection create is ok or not

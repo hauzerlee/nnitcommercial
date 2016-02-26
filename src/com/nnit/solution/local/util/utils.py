@@ -28,7 +28,7 @@ class PrimaryIDGenerator(object):
         """
         数据库表的主键生成器
         """
-        return str(shortuuid.uuid(Constant.UUID_SEED))
+        return str(shortuuid.uuid())
 
 
 class RedisConnection(object):
