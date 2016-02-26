@@ -33,5 +33,13 @@ class TestUserRedisDAO(unittest.TestCase):
         self.assertEqual(1, is_exist)
 
     def test_getMemberInfo(self):
-        member = self.userDAO.getMemberInfo("gST8epDEBF8ep4xdcJcGo2")
-        result = {}
+        result = self.userDAO.login(self.cell_phone)
+        print("test_getMemberInfo() --- ")
+        print(result)
+        print(result['memberid'])
+        print("--------------------------")
+        member = self.userDAO.getMemberInfo(result['memberid'])
+        print("test_getMemberInfo() --- ")
+        print(member)
+        print("--------------------------")
+        # result = {}

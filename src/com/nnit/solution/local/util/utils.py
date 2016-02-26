@@ -40,7 +40,7 @@ class RedisConnection(object):
 class SessionGenerator(object):
     @staticmethod
     def session_generate():
-        return uuid.uuid1(uuid.getnode(), datetime.datetime.now().microsecond)
+        return str(shortuuid.uuid())
 
 
 class SortedValueGenerator(object):

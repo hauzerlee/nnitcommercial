@@ -26,7 +26,7 @@ class UserRedisDAO(object):
         判断用户的手机号码是否已经被使用
         这是一个“手机号码”和“用户id”的映射
         :param cell_phone_number: 用户手机号码
-        :return Integer
+        :return boolean True:存在；False：不存在
         """
         is_exist = self.redis.sismember(Constant.MEMBER_USED_CELL_PHONE, cell_phone_number)
         return is_exist
@@ -34,25 +34,27 @@ class UserRedisDAO(object):
     def login(self, cell_phone_number):
         """
         用户登录，把数据存在Redis中。
-        方法要么返回True，要么抛出用户不存在异常
+        如果用户存在，就返回用户个人信息
+        否则，返回一个空的json对象
         :param cell_phone_number: 用户手机号码
-        :return 一个json字符串
+        :return 一个json对象
         """
-        return_result = []
+        return_result = {}
         is_exist = self.cell_phone_number_exist(cell_phone_number)
-        if is_exist == 0:
-            return_result.append("memberid:")
-            return_result.append("session_id:")
+        if not is_exist:
+            return_result["memberid"] = ""
+            return_result["session_id"] = ""
             return return_result
-        member_id = self.redis.hget(Constant.MEMBER_CELL_PHONE, cell_phone_number)
-        # 用户存在，直接放在Redis的对象中
-        session_id = utils.SessionGenerator.session_generate()
-        key_name = Constant.MEMBER + Constant.COLON + member_id.decode('utf-8')
-        self.redis.hmset(key_name, {'SESSION_ID': str(session_id)})
-        return_result = []
-        return_result.append("memberid:"+ member_id)
-        return_result.append("session_id:" + session_id)
-        return return_result
+        else:
+            member_id = self.redis.hget(Constant.MEMBER_CELL_PHONE, cell_phone_number)
+            # 用户存在，直接放在Redis的对象中
+            session_id = utils.SessionGenerator.session_generate()
+            key_name = Constant.MEMBER + Constant.COLON + member_id.decode('utf-8')
+            self.redis.hmset(key_name, {'SESSION_ID': str(session_id)})
+            # return_result = {}
+            return_result["memberid"] = member_id.decode('utf-8')
+            return_result["session_id"] = session_id
+            return return_result
 
     def getMemberInfo(self, member_id):
         """
