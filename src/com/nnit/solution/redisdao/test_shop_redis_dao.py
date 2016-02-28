@@ -67,6 +67,11 @@ class TestShopRedisDAO(unittest.TestCase):
         groupon_json = "{ID:12345, SHOP_ID:23456, TITLE:TEST_GROUPON, PICTURE:HTTP://WWW.ABC.IO/PIC1.JPGE," \
                        " ORIGINAL_PRICE:100.00, CURRENT_PRICE:50.00, START_TIME:9:00, END_TIME:19:00, DETAILS:THIS IS A TESTING GROUPON, " \
                        " CREATE_TIME:2016-01-01 12:32:23}"
-        groupon = json.loads(groupon_json, object_hook = utils.dict2object)
-        print(groupon)
-        print(groupon.SHOP_ID)
+        # groupon = json.loads(groupon_json, object_hook = utils.dict2object)
+        # print(groupon)
+        # print(groupon.SHOP_ID)
+
+    def test_get_shop_by_id(self):
+        shop_dao = shop_redis_dao.ShopRedisDAO()
+        print(shop_dao.get_shop_by_id("bsuE9msdeALT4ZhfyXRTRo"))
+

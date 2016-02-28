@@ -58,13 +58,15 @@ class ShopRedisDAO(object):
         根据ID提取一个店铺的全部信息，返回一个JSon对象
         如果没有传入shop_id，或者是一个无效的shop_id，返回一个空的json
         :param shop_id:  店铺的ID
+        :return shop info
         """
+        result = {}
         if shop_id.strip(): # 如果shop_id不为空
             redis_key = Constant.SHOP + Constant.COLON + shop_id
-            return json.dump(self.redis.hgetall(redis_key))
-        else:
-            return "{}"
-
+            shop_info = self.redis.hgetall(redis_key)
+            for (key, value) in shop_info.items():
+                result[key.decode('utf-8')] = value.decode('utf-8')
+        return result
 
     def get_shops(self, fetch_type=Constant.FETCH_SHOP_TYPE_DEFAULT, start=0, end=9):
         """

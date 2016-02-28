@@ -35,11 +35,14 @@ class TestPrimaryIDGenerator(unittest.TestCase):
     Test the connection create is ok or not
     '''
     def test_get_redis_connection(self):
-        host="localhost"
-        port=6079
-        dbName=""
-        redis_conn = utils.RedisConnection.get_redis_connection(host, port,dbName)
+        redis_conn = utils.RedisConnection.get_redis_connection()
         self.assertIsNotNone(redis_conn, 'Create the redis connection fail')
+
+    def test_redis_chinese(self):
+        redis_conn = utils.RedisConnection.get_redis_connection()
+        redis_conn.set("test", "我们是害虫")
+        print("测试中文：" + str(redis_conn.get("test")))
+
 
 if __name__ == '__main__':
     unittest.main()

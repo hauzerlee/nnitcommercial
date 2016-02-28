@@ -33,7 +33,7 @@ class PrimaryIDGenerator(object):
 
 class RedisConnection(object):
     @staticmethod
-    def get_redis_connection(host='localhost', port=6379, dbName=0):
+    def get_redis_connection(host='localhost', port=6379, charset='GBK', dbName=0):
         return redis.Redis(host=host, port=port, db=dbName)
 
 
