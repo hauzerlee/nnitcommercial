@@ -75,3 +75,14 @@ class TestShopRedisDAO(unittest.TestCase):
         shop_dao = shop_redis_dao.ShopRedisDAO()
         print(shop_dao.get_shop_by_id("bsuE9msdeALT4ZhfyXRTRo"))
 
+    def test_save_or_update(self):
+        shop_dao = shop_redis_dao.ShopRedisDAO()
+        shop_json = {"ID":"bsuE9msdeALT4ZhfyXRTRo","shop_name":"周大福","floor":"1F","location":"33号",
+                     "logo":"http://www.bac.org/logo.jpeg","true_scene":"http://www.bac.org/true_scene.jpeg",
+                     "telephone":"87282928","contact":"周大福","contact_tel":"1365935698",
+                     "introduction":"周大福珠宝金行由周至元先生于1929年广州市创立，其后迁往澳门，于1939年正式在香港成立。1956年，周大福由郑裕彤先生接手经营，始创999.9纯金首饰，成为今日首饰行业黄金成色的香港标准。",
+                     "category":"1","create_time":"2016-02-28 12:34:43","opening_time":"2015-12-01-01","member":"gST8epDEBF8ep4xdcJcGo2"}
+
+        shop_dao.save_or_update(shop_json)
+        print("test_save_or_update -> ")
+        print(shop_dao.get_shop_by_id('bsuE9msdeALT4ZhfyXRTRo'))

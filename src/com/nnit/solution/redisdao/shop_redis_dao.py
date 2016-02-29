@@ -22,35 +22,29 @@ class ShopRedisDAO(object):
         self.redis = utils.RedisConnection.get_redis_connection()
 
 
-    def save_or_update(self, shop_json_str='', shop_obj = None):
+    def save_or_update(self, shop_json_str, shop_obj = None):
         """
         保存或者更新一个shop对象
         这个shop对象，必须已经保存到了MySQL中。 对应的ID必须已经生成
         :param shop_json_str : 可以传入json串作为shop的数据，默认是一个空字符串
         :param shop_obj      : shop的对象实例，默认是一个None
         """
-        if shop_json_str.strip():
-            shop = json.loads(shop_json_str)
+        shop = None
+        if shop_json_str:
+            shop = shop_json_str
+        elif shop_obj is not None:
+            shop = json.dumps(shop_obj)
 
-        if shop_obj is not None:
-            shop = shop_obj
-
-        redis_key = Constant.SHOP + Constant.COLON + shop.ID
-        shop_mapping = {"ID":shop.ID, "SHOP_NAME":shop.name, "FLOOR": shop.floor,
-                        "LOCATION":shop.location, "LOGO":shop.logo, "TRUE_SCENE":shop.true_scene,
-                        "TELEPHONE":shop.telephone, "CONTACT":shop.contact, "CONTACT_TEL":shop.contact_tel,
-                        "INTRODUCTION":shop.introduction, "CATEGORY_ID":shop.category_id,
-                        "CREATE_TIME":shop.create_time, "OPENING_TIME":shop.opening_time,
-                        "MEMBER_ID": shop.member_id}
-        self.redis.hmset(redis_key, shop_mapping)
+        redis_key = Constant.SHOP + Constant.COLON + shop["ID"]
+        self.redis.hmset(redis_key, shop)
 
         #把商铺放到2个zset中（暂时只有2个），用于提取商品列表
         # score
         redis_key = Constant.SHOP + Constant.COLON + Constant.FETCH_SHOP_TYPE_DEFAULT
-        self.redis.zadd(redis_key,shop.ID, 3) # 默认给3分
+        self.redis.zadd(redis_key,shop["ID"], 3) # 默认给3分
         # join_date
         redis_key = Constant.SHOP + Constant.COLON + Constant.FETCH_SHOP_TYPE_DEFAULT
-        self.redis.zadd(redis_key,shop.ID, utils.getDatetToLong())
+        self.redis.zadd(redis_key,shop["ID"], utils.getDatetToLong())
 
 
     def get_shop_by_id(self, shop_id):

@@ -33,8 +33,10 @@ class PrimaryIDGenerator(object):
 
 class RedisConnection(object):
     @staticmethod
-    def get_redis_connection(host='localhost', port=6379, charset='GBK', dbName=0):
-        return redis.Redis(host=host, port=port, db=dbName)
+    def get_redis_connection(host='localhost', port=6379, charset='utf-8', dbName=0):
+        # pool = redis.ConnectionPool(host=host, port=port, db=dbName, charset=charset)
+        # return redis.Redis(connection_pool=pool)
+        return redis.Redis(host=host, port=port, db=dbName, charset=charset)
 
 
 class SessionGenerator(object):
