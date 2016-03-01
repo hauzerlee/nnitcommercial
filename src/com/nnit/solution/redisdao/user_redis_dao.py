@@ -197,6 +197,21 @@ class UserRedisDAO(object):
             # 从用户自己的队列中删除已经使用的Coupon Id
             redis.SREM(redis_structure_name, coupon_id)
 
+
+    def get_coupon_by_id(self, coupon_id):
+        """
+        得到一个优惠券的详细信息
+        :param coupon_id:
+        :return: 优惠券的map
+        """
+        result = {}
+        redis_structure_name = Constant.DISCOUNT + Constant.COLON + coupon_id
+        coupon = redis.hgetall(redis_structure_name)
+        for (key, value) in coupon.items():
+                result[key.decode('utf-8')] = value.decode('utf-8')
+        return result
+
+
     def get_current_integral(self, member_id):
         """
         提取APP用户当前可用积分
