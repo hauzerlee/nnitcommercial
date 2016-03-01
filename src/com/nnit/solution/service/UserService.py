@@ -92,6 +92,20 @@ class MemberServices(pyrestful.rest.RestHandler):
         except user_redis_dao.UserNotExistException:
             print('User NOT Exist Exception')
 
+    # REST-GET
+    @get(_path="/shoppingmall/members/integral/{cell_phone_num}", _products=mediatypes.APPLICATION_JSON)
+    def get_current_integral(self, cell_phone_num):
+        """
+        :param cell_phone_num 用户的手机号码
+        :return 用户当前可用的积分总数
+        """
+        member_id = user_redis_dao.UserRedisDAO.get_member_id_by_cell_phone(cell_phone_num)
+        if member_id:
+            return user_redis_dao.UserRedisDAO.get_current_integral(member_id)
+        return 0
+
+
+
 
 """
 通过用户的UUID来提取优惠券

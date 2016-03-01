@@ -31,6 +31,10 @@ class UserRedisDAO(object):
         is_exist = self.redis.sismember(Constant.MEMBER_USED_CELL_PHONE, cell_phone_number)
         return is_exist
 
+    def get_member_id_by_cell_phone(self, cell_phone_number):
+        return self.redis.hget(Constant.MEMBER_CELL_PHONE, cell_phone_number)
+
+
     def login(self, cell_phone_number):
         """
         用户登录，把数据存在Redis中。
@@ -46,7 +50,7 @@ class UserRedisDAO(object):
             return_result["session_id"] = ""
             return return_result
         else:
-            member_id = self.redis.hget(Constant.MEMBER_CELL_PHONE, cell_phone_number)
+            member_id = self.get_member_id_by_cell_phone(cell_phone_number)
             # 用户存在，直接放在Redis的对象中
             session_id = utils.SessionGenerator.session_generate()
             key_name = Constant.MEMBER + Constant.COLON + member_id.decode('utf-8')
@@ -192,6 +196,40 @@ class UserRedisDAO(object):
         if has_this_coupon == 1:
             # 从用户自己的队列中删除已经使用的Coupon Id
             redis.SREM(redis_structure_name, coupon_id)
+
+    def get_current_integral(self, member_id):
+        """
+        提取APP用户当前可用积分
+        :param member_id 用户的member ID
+        :return: 积分数值
+        """
+        integral_key = Constant.INTEGRAL + Constant.COLON + member_id
+        return int(self.redis.get(integral_key))
+
+    def clear_integral(self, member_id):
+        """
+        把用户的积分清零
+        :param member_id:
+        :return:
+        """
+        integral_key = Constant.INTEGRAL + Constant.COLON + member_id
+        self.redis.set(integral_key, 0)
+
+
+    def save_or_update_integral(self, member_id, increase):
+        """
+        更新用户的积分
+        :param member_id: 用户的ID
+        :param increase:  新增的积分数
+        :return:
+        """
+        current_integral = self.get_current_integral(member_id)
+        integral_key = Constant.INTEGRAL + Constant.COLON + member_id
+        if current_integral:
+            increase = increase + int(current_integral)
+        # 存入redis中
+        return self.redis.set(integral_key, increase)
+
 
 
 class UserNotExistException(object):

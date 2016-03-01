@@ -43,3 +43,10 @@ class TestUserRedisDAO(unittest.TestCase):
         print(member)
         print("--------------------------")
         # result = {}
+
+    def test_get_current_integral(self):
+        member_id = 'gST8epDEBF8ep4xdcJcGo2'
+        self.userDAO.clear_integral(member_id)
+        save_result = self.userDAO.save_or_update_integral(member_id, 100)
+        result = self.userDAO.get_current_integral(member_id)
+        self.assertEqual(100, result)
