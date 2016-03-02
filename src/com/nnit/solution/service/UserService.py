@@ -42,7 +42,6 @@ class MemberServices(pyrestful.rest.RestHandler):
 
         返回：用户的个人信息
         """
-        print("cell_phone_num -> " + cell_phone_num)
         return user_redis_dao.UserRedisDAO.login(cell_phone_num)
 
     # REST-POST
@@ -50,16 +49,10 @@ class MemberServices(pyrestful.rest.RestHandler):
     def enrol(self, cell_phone_num, password):
         print("cell_phone_num -> " + cell_phone_num)
         enrol_result = {"status": False, "memberId": '', "sessionId": ''}
-        # enrol_result["status"] = False
-        # enrol_result["memberId"] = ""
-        # enrol_result["sessionId"] = ""
         if cell_phone_num is not None:
             redis_dao = user_redis_dao.UserRedisDAO()
             result = redis_dao.enrol(cell_phone_num, password)
             if result:
-                # enrol_result["status"] = True
-                # enrol_result["memberId"] = result[0]
-                # enrol_result["sessionId"] = result[1]
                 enrol_result = {"status": True, "memberId": result[0], "sessionId": result[1]}
         return enrol_result
 
@@ -93,13 +86,13 @@ class MemberServices(pyrestful.rest.RestHandler):
             print('User NOT Exist Exception')
 
     # REST-GET
-    @get(_path="/shoppingmall/integral/{cell_phone_num}", _products=mediatypes.APPLICATION_JSON)
-    def get_current_integral(self, cell_phone_num):
+    @get(_path="/shoppingmall/integral/{cell_phone_number}", _products=mediatypes.APPLICATION_JSON)
+    def get_current_integral(self, cell_phone_number):
         """
         :param cell_phone_num 用户的手机号码
         :return 用户当前可用的积分总数
         """
-        member_id = user_redis_dao.UserRedisDAO.get_member_id_by_cell_phone(cell_phone_num)
+        member_id = user_redis_dao.UserRedisDAO.get_member_id_by_cell_phone(cell_phone_number)
         if member_id:
             return user_redis_dao.UserRedisDAO.get_current_integral(member_id)
         return 0
@@ -147,6 +140,9 @@ class MemberServices(pyrestful.rest.RestHandler):
     @get(_path="/shoppingmall/discounts/{discountid}", _products=mediatypes.APPLICATION_JSON )
     def get_discount_detail(self,discount_id):
         """
+        返回优惠券的详细信息
+        :param discount_id 优惠券ID
+        :return 优惠券的详细信息
         """
         return user_redis_dao.UserRedisDAO.get_coupon_by_id(discount_id)
 

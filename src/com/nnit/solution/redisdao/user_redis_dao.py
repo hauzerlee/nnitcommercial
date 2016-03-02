@@ -32,6 +32,11 @@ class UserRedisDAO(object):
         return is_exist
 
     def get_member_id_by_cell_phone(self, cell_phone_number):
+        """
+        根据手机号码转化为member ID
+        :param cell_phone_number:
+        :return:
+        """
         return self.redis.hget(Constant.MEMBER_CELL_PHONE, cell_phone_number)
 
 
