@@ -20,7 +20,7 @@ if __name__ == "__main__":
 
     try:
         app = pyrestful.rest.RestService(restservices)
-        port = 8889
+        port = 8888
         app.listen(port)
         tornado.ioloop.IOLoop.instance().start()
     except Exception:
