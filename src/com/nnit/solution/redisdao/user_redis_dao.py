@@ -175,7 +175,7 @@ class UserRedisDAO(object):
         :return 无
         """
         redis_structure_name = Constant.FAVORS + Constant.COLON + member_id
-        has_this_favor = redis.SISMEMBER(redis_structure_name, shop_id)
+        has_this_favor = self.redis.sismember(redis_structure_name, shop_id)
         if has_this_favor == 1:
             # 从用户自己的队列中删除收藏的shop id
             redis.SREM(redis_structure_name, shop_id)
