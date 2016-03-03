@@ -50,11 +50,7 @@ class UserRedisDAO(object):
         """
         return_result = {}
         is_exist = self.cell_phone_number_exist(cell_phone_number)
-        if not is_exist:
-            return_result["memberid"] = ""
-            return_result["session_id"] = ""
-            return return_result
-        else:
+        if is_exist:
             member_id = self.get_member_id_by_cell_phone(cell_phone_number)
             # 用户存在，直接放在Redis的对象中
             session_id = utils.SessionGenerator.session_generate()
@@ -63,6 +59,10 @@ class UserRedisDAO(object):
             # return_result = {}
             return_result["memberid"] = member_id.decode('utf-8')
             return_result["session_id"] = session_id
+            return return_result
+        else:
+            return_result["memberid"] = ""
+            return_result["session_id"] = ""
             return return_result
 
     def getMemberInfo(self, member_id):

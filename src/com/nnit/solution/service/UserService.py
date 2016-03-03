@@ -30,7 +30,7 @@ class MemberServices(pyrestful.rest.RestHandler):
         return redis_dao.getMemberInfo(member_id)
 
     # REST-POST
-    @post(_path="/shoppingmall/members/login", _types=[str], _produces=mediatypes.APPLICATION_JSON)
+    @post(_path="/shoppingmall/members/login", _types=[bytes], _produces=mediatypes.APPLICATION_JSON)
     def login(self, cell_phone_num):
         """
         这个方法适用于用户已经重手机端登出，
@@ -43,7 +43,7 @@ class MemberServices(pyrestful.rest.RestHandler):
 
         返回：用户的个人信息
         """
-        redis_dao = user_redis_dao.UserRedisDA()
+        redis_dao = user_redis_dao.UserRedisDAO()
         return redis_dao.login(cell_phone_num)
 
     # REST-POST
@@ -88,7 +88,7 @@ class MemberServices(pyrestful.rest.RestHandler):
             print('User NOT Exist Exception')
 
     # REST-GET
-    @get(_path="/shoppingmall/integral/{cell_phone_num}",_types=[str], _products=mediatypes.APPLICATION_JSON)
+    @get(_path="/shoppingmall/integral/{cell_phone_num}",_types=[bytes], _products=mediatypes.APPLICATION_JSON)
     def get_current_integral(self, cell_phone_num):
         """
         :param cell_phone_num 用户的手机号码
@@ -105,7 +105,7 @@ class MemberServices(pyrestful.rest.RestHandler):
         return integral
 
     # REST-GET
-    @get(_path="/shoppingmall/favours/{member_id}", _types=[str], _products=mediatypes.APPLICATION_JSON)
+    @get(_path="/shoppingmall/favours/{member_id}", _types=[bytes], _products=mediatypes.APPLICATION_JSON)
     def fetch_favors(self, member_id):
         """
         返回用户关注的商铺内容
