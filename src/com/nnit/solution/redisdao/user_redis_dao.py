@@ -57,11 +57,11 @@ class UserRedisDAO(object):
             key_name = Constant.MEMBER + Constant.COLON + member_id.decode('utf-8')
             self.redis.hmset(key_name, {'SESSION_ID': str(session_id)})
             # return_result = {}
-            return_result["memberid"] = member_id.decode('utf-8')
+            return_result["member_id"] = member_id.decode('utf-8')
             return_result["session_id"] = session_id
             return return_result
         else:
-            return_result["memberid"] = ""
+            return_result["member_id"] = ""
             return_result["session_id"] = ""
             return return_result
 
