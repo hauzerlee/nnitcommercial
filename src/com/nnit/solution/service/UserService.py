@@ -30,7 +30,7 @@ class MemberServices(pyrestful.rest.RestHandler):
         return redis_dao.getMemberInfo(member_id)
 
     # REST-POST
-    @post(_path="/shoppingmall/members/login", _types=[bytes], _produces=mediatypes.APPLICATION_JSON)
+    @post(_path="/shoppingmall/members/login", _types=[str], _produces=mediatypes.APPLICATION_JSON)
     def login(self, cell_phone_num):
         """
         这个方法适用于用户已经重手机端登出，
@@ -87,19 +87,19 @@ class MemberServices(pyrestful.rest.RestHandler):
             print('User NOT Exist Exception')
 
     # REST-GET
-    @get(_path="/shoppingmall/integral/{cell_phone_number}",_types=[str], _products=mediatypes.APPLICATION_JSON)
-    def get_current_integral(self, cell_phone_number):
+    @get(_path="/shoppingmall/integral/{cell_phone_num}",_types=[str], _products=mediatypes.APPLICATION_JSON)
+    def get_current_integral(self, cell_phone_num):
         """
         :param cell_phone_num 用户的手机号码
         :return 用户当前可用的积分总数
         """
         integral = {}
+        score = 0
         redis_dao = user_redis_dao.UserRedisDAO()
-        member_id = redis_dao.get_member_id_by_cell_phone(cell_phone_number)
+        member_id = redis_dao.get_member_id_by_cell_phone(cell_phone_num).decode('utf-8')
         if member_id:
-            integral["score"]=redis_dao.get_current_integral(member_id.decode('utf-8'))
-        else:
-            integral["score"]=0
+            score=redis_dao.get_current_integral(member_id)
+        integral["score"] = score
         print(integral)
         return integral
 

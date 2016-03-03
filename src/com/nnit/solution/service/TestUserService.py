@@ -17,7 +17,7 @@ class TestUserService(unittest.TestCase):
         password = "123456"
         params = urllib.urlencode({'cell_phone_num':cell_phone_num, 'password':password})
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
-        conn = httplib.HTTPConnection("localhost:8888")
+        conn = httplib.HTTPConnection("localhost:8889")
         conn.request('POST', '/shoppingmall/members/enrol', params, headers)
 
         resp = conn.getresponse()
