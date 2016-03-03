@@ -32,7 +32,7 @@ class TestUserService(unittest.TestCase):
         cell_phone_num = "13612077384"
         params = urllib.urlencode({'cell_phone_num':cell_phone_num})
         headers = {"Content-Type": "application/x-www-form-urlencoded"}
-        conn = httplib.HTTPConnection("localhost:8888")
+        conn = httplib.HTTPConnection("localhost:8889")
         conn.request('POST', '/shoppingmall/members/login', params, headers)
 
         resp = conn.getresponse()

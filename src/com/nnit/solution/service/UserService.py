@@ -43,7 +43,8 @@ class MemberServices(pyrestful.rest.RestHandler):
 
         返回：用户的个人信息
         """
-        return user_redis_dao.UserRedisDAO.login(cell_phone_num)
+        redis_dao = user_redis_dao.UserRedisDA()
+        return redis_dao.login(cell_phone_num)
 
     # REST-POST
     @post(_path="/shoppingmall/members/enrol", _types=[bytes, bytes], _produces=mediatypes.APPLICATION_JSON)
