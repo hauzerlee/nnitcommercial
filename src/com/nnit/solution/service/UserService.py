@@ -8,7 +8,6 @@
 APP、 后台管理系统，与用户相关的操作，都定义在这个Service中
 """
 
-import json
 import pyrestful.rest
 from pyrestful import mediatypes
 from pyrestful.rest import get
@@ -88,7 +87,7 @@ class MemberServices(pyrestful.rest.RestHandler):
             print('User NOT Exist Exception')
 
     # REST-GET
-    @get(_path="/shoppingmall/integral/{cell_phone_num}",_types=[bytes], _products=mediatypes.APPLICATION_JSON)
+    @get(_path="/shoppingmall/integral/{cell_phone_num}", _produces=mediatypes.APPLICATION_JSON)
     def get_current_integral(self, cell_phone_num):
         """
         :param cell_phone_num 用户的手机号码
@@ -97,15 +96,14 @@ class MemberServices(pyrestful.rest.RestHandler):
         integral = {}
         score = 0
         redis_dao = user_redis_dao.UserRedisDAO()
-        member_id = redis_dao.get_member_id_by_cell_phone(cell_phone_num).decode('utf-8')
+        member_id = redis_dao.get_member_id_by_cell_phone(cell_phone_num)
         if member_id:
             score=redis_dao.get_current_integral(member_id)
         integral["score"] = score
-        print(integral)
         return integral
 
     # REST-GET
-    @get(_path="/shoppingmall/favours/{member_id}", _types=[bytes], _products=mediatypes.APPLICATION_JSON)
+    @get(_path="/shoppingmall/favours/{member_id}", _produces=mediatypes.APPLICATION_JSON)
     def fetch_favors(self, member_id):
         """
         返回用户关注的商铺内容
@@ -113,10 +111,11 @@ class MemberServices(pyrestful.rest.RestHandler):
         :return
         """
         redis_dao = user_redis_dao.UserRedisDAO()
-        return redis_dao.fetch_coupons(member_id)
+        shops =  redis_dao.fetch_favors(member_id) # shops is a map
+        return shops
 
     # REST-GET
-    @get(_path="/shoppingmall/favours/member/{member_id}/page/{page_id}", _products=mediatypes.APPLICATION_JSON)
+    @get(_path="/shoppingmall/favours/member/{member_id}/page/{page_id}", _produces=mediatypes.APPLICATION_JSON)
     def fetch_favors_in_range(self, member_id, page_id):
         """
         返回用户关注的商铺列表（分页返回）
@@ -128,16 +127,22 @@ class MemberServices(pyrestful.rest.RestHandler):
         return redis_dao.fetch_favors_in_range(member_id, page_id)
 
     # REST-POST
-    @post(_path="/shoppingmall/favours/member/{member_id}/shop/{shop_id}", _types=[bytes, bytes],
-          _products=mediatypes.APPLICATION_JSON)
-    def remove_favor(self, member_id, shop_id):
+    @post(_path="/shoppingmall/favours/member/shop/remove", _types=[bytes, bytes], _produces=mediatypes.APPLICATION_JSON)
+    def remove_favor_shop(self, member_id, shop_id):
         """
+        提取用户关注的某个商铺的详细信息
+        :param member_id
+        :param shop_id
+        :return shop
         """
         redis_dao = user_redis_dao.UserRedisDAO()
-        redis_dao.remove_favor(member_id, shop_id)
+        removeCount = redis_dao.remove_favor(member_id, shop_id)
+        result = {}
+        result["remove_count"] = removeCount
+        return result
 
     # REST-GET
-    @get(_path="/shoppingmall/member/{member_id}/discounts", _products=mediatypes.APPLICATION_JSON)
+    @get(_path="/shoppingmall/member/{member_id}/discounts", _produces=mediatypes.APPLICATION_JSON)
     def fetch_discounts(self, member_id):
         """
         返回用户收藏的优惠券列表
@@ -147,7 +152,7 @@ class MemberServices(pyrestful.rest.RestHandler):
         return user_redis_dao.UserRedisDAO.fetch_coupons(member_id)
 
     # REST-GET
-    @get(_path="/shoppingmall/discounts/{discountid}", _products=mediatypes.APPLICATION_JSON )
+    @get(_path="/shoppingmall/discounts/{discountid}", _produces=mediatypes.APPLICATION_JSON )
     def get_discount_detail(self,discount_id):
         """
         返回优惠券的详细信息

@@ -11,6 +11,7 @@
 import json
 
 import redis
+import redis.client
 
 from com.nnit.solution.local import Constant
 from com.nnit.solution.local.util import utils
@@ -139,17 +140,25 @@ class UserRedisDAO(object):
         :return 收藏的店铺列表
         """
         redis_structure_name = Constant.FAVORS + Constant.COLON + member_id
-        shop_ids = redis.smembers(redis_structure_name)  # 得到收藏的店铺id列表
+        print(self.redis.smembers(redis_structure_name))
+        shop_ids = self.redis.smembers(redis_structure_name)  # 得到收藏的店铺id列表
         shops = []
         index = 0
         # 开始提取店铺的详细信息
         for shop_id in shop_ids:
-            shops.insert(index, json.dump(self.redis.hgetall(Constant.SHOP + Constant.COLON + shop_id)))
+            key = Constant.SHOP + Constant.COLON + shop_id.decode('utf-8')
+            shop = self.redis.hgetall(key)
+            shop_tmp = {}
+            for (key, value) in shop.items():
+                shop_tmp[key.decode('utf-8')] = value.decode('utf-8')
+            shops.insert(index, shop_tmp)
+            # shops.insert(index, shop)
             index += 1
-        shops_map = {Constant.JSON_HEAD_SHOPS: shops}
-        return json.dump(shops_map)
+        shops_map = {}
+        shops_map[Constant.JSON_HEAD_SHOPS] = shops
+        return shops_map
 
-    def fetch_favors_in_range(self, member_id, quantity_per_page):
+    def fetch_favors_in_range(self, member_id, page_number):
         """
         随机返回一定数量的收藏商铺
         :param member_id:
@@ -157,15 +166,20 @@ class UserRedisDAO(object):
         :return 一个店铺的列表（json格式，也是一个小map）
         """
         redis_structure_name = Constant.FAVORS + Constant.COLON + member_id
-        shop_ids = redis.srandmember(redis_structure_name, quantity_per_page)
+        shop_ids = self.redis.srandmember(redis_structure_name, Constant.QUANTITY_PER_PAGE * page_number)
         shops = []
         index = 0
         # 开始提取店铺的详细信息
         for shop_id in shop_ids:
-            shops.insert(index, json.dump(self.redis.hgetall(Constant.SHOP + Constant.COLON + shop_id)))
+            shop_raw = self.redis.hgetall(Constant.SHOP + Constant.COLON + shop_id.decode('utf-8'))
+            shop = {}
+            for key, value in shop_raw.items():
+                shop[key.decode('utf-8')] = value.decode('utf-8')
+            shops.insert(index, shop)
             index += 1
-        shops_map = {Constant.JSON_HEAD_SHOPS: shops}
-        return json.dump(shops_map)
+        shops_map = {}
+        shops_map[Constant.JSON_HEAD_SHOPS] = shops
+        return shops_map
 
     def remove_favor(self, member_id, shop_id):
         """
@@ -176,9 +190,11 @@ class UserRedisDAO(object):
         """
         redis_structure_name = Constant.FAVORS + Constant.COLON + member_id
         has_this_favor = self.redis.sismember(redis_structure_name, shop_id)
-        if has_this_favor == 1:
+        removeCount = 0
+        if has_this_favor:
             # 从用户自己的队列中删除收藏的shop id
-            redis.SREM(redis_structure_name, shop_id)
+            removeCount = self.redis.srem(redis_structure_name, shop_id)
+        return removeCount
 
     def fetch_coupons(self, member_id):
         """
@@ -223,7 +239,7 @@ class UserRedisDAO(object):
         :param member_id 用户的member ID
         :return: 积分数值
         """
-        integral_key = Constant.INTEGRAL + Constant.COLON + member_id
+        integral_key = Constant.INTEGRAL + Constant.COLON + member_id.decode('utf-8')
         return int(self.redis.get(integral_key))
 
     def clear_integral(self, member_id):

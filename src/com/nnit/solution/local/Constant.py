@@ -47,3 +47,6 @@ JSON_HEAD_DISCOUNTS = "discounts"
 JSON_HEAD_PRODUCTS = "products"
 JSON_HEAD_GROUPS = "groups"
 JSON_HEAD_TRXS = "trx"
+
+#每页显示的数量
+QUANTITY_PER_PAGE = 10
