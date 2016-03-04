@@ -13,6 +13,7 @@ from pyrestful import mediatypes
 from pyrestful.rest import get
 from pyrestful.rest import post
 
+from com.nnit.solution.local import Constant
 from com.nnit.solution.local.util import utils
 from com.nnit.solution.redisdao import user_redis_dao
 
@@ -149,7 +150,8 @@ class MemberServices(pyrestful.rest.RestHandler):
         :param  member_id 用户的ID
         :return 优惠券列表
         """
-        return user_redis_dao.UserRedisDAO.fetch_coupons(member_id)
+        redis_dao = user_redis_dao.UserRedisDAO()
+        return redis_dao.fetch_coupons(member_id)
 
     # REST-GET
     @get(_path="/shoppingmall/discounts/{discountid}", _produces=mediatypes.APPLICATION_JSON )
@@ -159,125 +161,22 @@ class MemberServices(pyrestful.rest.RestHandler):
         :param discount_id 优惠券ID
         :return 优惠券的详细信息
         """
-        return user_redis_dao.UserRedisDAO.get_coupon_by_id(discount_id)
+        redis_dao = user_redis_dao.UserRedisDAO()
+        return redis_dao.get_coupon_by_id(discount_id)
 
-"""
-通过用户的UUID来提取优惠券
-
-返回一个优惠券的列表
-"""
-
-
-def fetch_coupons(self, member_id):
-    coupons = user_redis_dao.UserRedisDAO.fetch_coupons(member_id)
-    pass
-
-
-"""
-提取某个类型的优惠券
-
-返回一个优惠券的列表
-"""
+    # REST-GET
+    @get(_path="/shoppingmall/coupons/members/{member_id}", _produces=mediatypes.APPLICATION_JSON)
+    def fetch_groupons(self, member_id):
+        """
+        通过用户的UUID来提取优惠券
+        返回一个优惠券的列表
+        :param member_id
+        :return
+        """
+        redis_dao = user_redis_dao.UserRedisDAO()
+        groupons = redis_dao.fetch_groupons(member_id)
+        groupons_dict = {}
+        groupons_dict[Constant.GROUPONS] = groupons
+        return groupons_dict
 
 
-def fetch_coupons_with_type(self, member_id, coupon_type):
-    pass
-
-
-def fetch_favor(self, member_id):
-    pass
-
-
-"""
-用户修改密码
-
-返回True或者False
-"""
-
-
-def change_password(self, old_pwd, new_pwd, confirm_new_pwd):
-    if new_pwd != confirm_new_pwd:
-        return False
-    pass
-
-
-"""
-用户登出
-
-返回True或者False
-"""
-
-
-def log_out(self, member_id):
-    pass
-
-
-"""
-查询会员积分
-
-返回一个Integer
-"""
-
-
-def watch_integral_balance(self, member_id):
-    pass
-
-
-"""
-提取用户积分交易的记录
-根据交易时间倒叙排列返回
-
-返回一个List
-"""
-
-
-def fetch_trx_of_integral(self, member_id):
-    pass
-
-
-"""
-未读消息的数量
-
-返回： Integer
-"""
-
-
-def new_msg_count(self, member_id):
-    redis_key = "Message:new:" + member_id
-    return self.redis.scard(redis_key)
-
-
-"""
-获取未读的消息
-
-返回一个消息列表
-"""
-
-
-def new_msgs(self, member_id):
-    redis_key = "Message:new:" + member_id
-    return self.redis.smember(redis_key)
-
-
-"""
-全部消息的数量
-
-返回： Integer
-"""
-
-
-def msg_count(self, member_id):
-    redis_ley = "Message:" + member_id
-    return self.redis.scard(redis_ley)
-
-
-"""
-获取全部消息
-
-返回一个消息列表
-"""
-
-
-def new_msgs(self, member_id):
-    redis_key = "Message:" + member_id
-    return self.redis.smember(redis_key)

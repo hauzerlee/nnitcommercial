@@ -33,11 +33,11 @@ MEMBER = 'Member'
 MEMBER_CELL_PHONE = 'Member:cellphone'
 MEMBER_USED_CELL_PHONE = 'Member:used_cellphone'
 FAVORS = 'Favors'
-COUPON_BACKAGE = 'Couponbackage'
 INTEGRAL = 'Integral'
 
 HOT_GROUPONS = 'Hot_Groupons'
 GROUPON = 'Groupon'
+GROUPONS = "Groupons"
 DISCOUNTS_SORT = 'Discounts:discountSort'
 DISCOUNT = 'Discount'
 

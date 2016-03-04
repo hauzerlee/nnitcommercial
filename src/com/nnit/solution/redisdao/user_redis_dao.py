@@ -196,16 +196,26 @@ class UserRedisDAO(object):
             removeCount = self.redis.srem(redis_structure_name, shop_id)
         return removeCount
 
-    def fetch_coupons(self, member_id):
+    def fetch_groupons(self, member_id):
         """
         提取用户的优惠券
         :param member_id:
-        :return：优惠券列表(IDs)
+        :return：
         """
-        redis_structure_name = Constant.COUPON_BACKAGE + Constant.COLON + member_id
-        return redis.smembers(redis_structure_name)
+        redis_structure_name = Constant.GROUPON + Constant.COLON + member_id
+        groupon_ids = self.redis.smembers(redis_structure_name)
+        groupons = []
+        index = 0
+        for groupon_id in groupon_ids:
+            groupon = self.redis.hgetall(Constant.GROUPON + Constant.COLON + groupon_id.decode('utf-8'))
+            g = {}
+            for key, value in groupon.items():
+                g[key.decode('utf-8')] = value.decode('utf-8')
+            groupons.insert(index, g)
+            index +=1
+        return groupons
 
-    def use_coupon(self, member_id, coupon_id):
+    def use_groupon(self, member_id, coupon_id):
         """
         使用一个coupon，直接从用户的redis列表中删除
         :param member_id:
@@ -219,7 +229,7 @@ class UserRedisDAO(object):
             redis.SREM(redis_structure_name, coupon_id)
 
 
-    def get_coupon_by_id(self, coupon_id):
+    def get_groupon_by_id(self, coupon_id):
         """
         得到一个优惠券的详细信息
         :param coupon_id:
