@@ -171,7 +171,7 @@ class MemberServices(pyrestful.rest.RestHandler):
         通过用户的UUID来提取优惠券
         返回一个优惠券的列表
         :param member_id
-        :return
+        :return 返回一个groupons的map
         """
         redis_dao = user_redis_dao.UserRedisDAO()
         groupons = redis_dao.fetch_groupons(member_id)
@@ -179,4 +179,17 @@ class MemberServices(pyrestful.rest.RestHandler):
         groupons_dict[Constant.GROUPONS] = groupons
         return groupons_dict
 
+    # REST-POST
+    @post(_path="/shoppingmall/member/groupons/consume", _types=[bytes, bytes], _produces=mediatypes.APPLICATION_JSON)
+    def use_groupon(self, member_id, groupon_id):
+        """
+        消费一个团购
+        :param member_id:
+        :param groupon_id:
+        :return:
+        """
+        redis_dao = user_redis_dao.UserRedisDAO()
+        count = redis_dao.use_groupon(member_id, groupon_id)
+        if count: # 如果已经删除,则需要往交易的redis中放置一条交易记录
+            pass;
 

@@ -38,6 +38,7 @@ INTEGRAL = 'Integral'
 HOT_GROUPONS = 'Hot_Groupons'
 GROUPON = 'Groupon'
 GROUPONS = "Groupons"
+GROUPON_ORDERS = "Orders"
 DISCOUNTS_SORT = 'Discounts:discountSort'
 DISCOUNT = 'Discount'
 

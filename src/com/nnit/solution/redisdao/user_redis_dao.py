@@ -40,7 +40,6 @@ class UserRedisDAO(object):
         """
         return self.redis.hget(Constant.MEMBER_CELL_PHONE, cell_phone_number)
 
-
     def login(self, cell_phone_number):
         """
         用户登录，把数据存在Redis中。
@@ -212,7 +211,7 @@ class UserRedisDAO(object):
             for key, value in groupon.items():
                 g[key.decode('utf-8')] = value.decode('utf-8')
             groupons.insert(index, g)
-            index +=1
+            index += 1
         return groupons
 
     def use_groupon(self, member_id, coupon_id):
@@ -222,12 +221,11 @@ class UserRedisDAO(object):
         :param coupon_id:
         :return 无
         """
-        redis_structure_name = Constant.COUPON_BACKAGE + Constant.COLON + member_id
+        redis_structure_name = Constant.GROUPON + Constant.COLON + member_id
         has_this_coupon = redis.SISMEMBER(redis_structure_name, coupon_id)
-        if has_this_coupon == 1:
+        if has_this_coupon:
             # 从用户自己的队列中删除已经使用的Coupon Id
-            redis.SREM(redis_structure_name, coupon_id)
-
+            self.redis.srem(redis_structure_name, coupon_id)
 
     def get_groupon_by_id(self, coupon_id):
         """
@@ -239,9 +237,8 @@ class UserRedisDAO(object):
         redis_structure_name = Constant.DISCOUNT + Constant.COLON + coupon_id
         coupon = redis.hgetall(redis_structure_name)
         for (key, value) in coupon.items():
-                result[key.decode('utf-8')] = value.decode('utf-8')
+            result[key.decode('utf-8')] = value.decode('utf-8')
         return result
-
 
     def get_current_integral(self, member_id):
         """
@@ -261,7 +258,6 @@ class UserRedisDAO(object):
         integral_key = Constant.INTEGRAL + Constant.COLON + member_id
         self.redis.set(integral_key, 0)
 
-
     def save_or_update_integral(self, member_id, increase):
         """
         更新用户的积分
@@ -276,6 +272,21 @@ class UserRedisDAO(object):
         # 存入redis中
         return self.redis.set(integral_key, increase)
 
+    def save_groupon_trx(self, member_id, groupon_id):
+        """
+        用户消费一个团购,需要记录这笔交易
+
+        :param member_id:
+        :param groupon_id:
+        :return:
+        """
+        groupon = self.redis.hgetall(Constant.GROUPON + Constant.COLON + groupon_id)
+        # 用户的团购交易结构
+        redis_key = Constant.MEMBER + Constant.COLON + member_id + Constant.COLON + Constant.GROUPON + Constant.GROUPON_ORDERS  # Member:gST8epDEBF8ep4xdcJcGo2:Groupon:Orders
+        trx = {}
+        trx["id"] = utils.PrimaryIDGenerator.primary_id_generator()
+        trx["groupon_id"] = groupon("ID")
+        self.redis.sadd(redis_key, trx) #交易记录
 
 
 class UserNotExistException(object):
