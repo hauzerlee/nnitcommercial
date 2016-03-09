@@ -42,6 +42,8 @@ GROUPON_ORDERS = "Orders"
 DISCOUNTS_SORT = 'Discounts:discountSort'
 DISCOUNT = 'Discount'
 
+AUTHORIZATION = 'Authorization'
+
 #JSON列表的key
 JSON_HEAD_SHOPS = "shops"
 JSON_HEAD_DISCOUNTS = "discounts"

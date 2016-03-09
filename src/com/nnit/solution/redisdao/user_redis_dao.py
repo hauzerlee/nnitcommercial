@@ -40,6 +40,17 @@ class UserRedisDAO(object):
         """
         return self.redis.hget(Constant.MEMBER_CELL_PHONE, cell_phone_number)
 
+    def auth_session_id(self,member_id, session_id):
+        """
+        看看这个session是否是上次登陆的
+        :param member_id
+        :param session_id
+        :return: true 或者 false
+        """
+        key_name = Constant.MEMBER + Constant.COLON + member_id.decode('utf-8') # Sample -> Member:gST8epDEBF8ep4xdcJcGo2
+        old_session_in_sys = self.redis.hmget(key_name,"session_id")[0].decode('utf-8')
+        return old_session_in_sys==session_id
+
     def login(self, cell_phone_number):
         """
         用户登录，把数据存在Redis中。
@@ -54,8 +65,8 @@ class UserRedisDAO(object):
             member_id = self.get_member_id_by_cell_phone(cell_phone_number)
             # 用户存在，直接放在Redis的对象中
             session_id = utils.SessionGenerator.session_generate()
-            key_name = Constant.MEMBER + Constant.COLON + member_id.decode('utf-8')
-            self.redis.hmset(key_name, {'SESSION_ID': str(session_id)})
+            key_name = Constant.MEMBER + Constant.COLON + member_id.decode('utf-8') # Sample -> Member:gST8epDEBF8ep4xdcJcGo2
+            self.redis.hmset(key_name, {'session_id': str(session_id)})
             # return_result = {}
             return_result["member_id"] = member_id.decode('utf-8')
             return_result["session_id"] = session_id

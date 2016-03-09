@@ -3,6 +3,8 @@ import http.client as httplib
 import urllib.parse as urllib
 import json
 
+from com.nnit.solution.local import Constant
+
 
 class TestUserService(unittest.TestCase):
 
@@ -31,7 +33,7 @@ class TestUserService(unittest.TestCase):
     def test_login(self):
         cell_phone_num = '13612077384'
         params = urllib.urlencode({'cell_phone_num':cell_phone_num})
-        headers = {"Content-Type": "application/x-www-form-urlencoded"}
+        headers = {"Content-Type": "application/x-www-form-urlencoded", Constant.AUTHORIZATION:"K3o3nbndx2FaZ2Y2kBRrS8"}
         conn = httplib.HTTPConnection("localhost:8888")
         conn.request('POST', '/shoppingmall/members/login', params, headers)
 

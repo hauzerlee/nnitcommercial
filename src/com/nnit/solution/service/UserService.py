@@ -43,8 +43,18 @@ class MemberServices(pyrestful.rest.RestHandler):
 
         返回：用户的个人信息
         """
+
+        old_session_id = self.request.headers[Constant.AUTHORIZATION]
         redis_dao = user_redis_dao.UserRedisDAO()
-        return redis_dao.login(cell_phone_num)
+        member_id = redis_dao.get_member_id_by_cell_phone(cell_phone_num)
+        auth_result = redis_dao.auth_session_id(member_id, old_session_id)
+        if auth_result:
+            return redis_dao.login(cell_phone_num)
+        else:
+            return_result = {}
+            return_result["member_id"] = ""
+            return_result["session_id"] = ""
+            return return_result
 
     # REST-POST
     @post(_path="/shoppingmall/members/enrol", _types=[bytes, bytes], _produces=mediatypes.APPLICATION_JSON)
