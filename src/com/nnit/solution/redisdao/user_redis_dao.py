@@ -49,7 +49,10 @@ class UserRedisDAO(object):
         """
         key_name = Constant.MEMBER + Constant.COLON + member_id.decode('utf-8') # Sample -> Member:gST8epDEBF8ep4xdcJcGo2
         old_session_in_sys = self.redis.hmget(key_name,"session_id")[0].decode('utf-8')
-        return old_session_in_sys==session_id
+        if old_session_in_sys:
+            return old_session_in_sys==session_id
+        else:
+            return True
 
     def login(self, cell_phone_number):
         """

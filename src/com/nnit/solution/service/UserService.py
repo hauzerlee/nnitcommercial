@@ -47,7 +47,10 @@ class MemberServices(pyrestful.rest.RestHandler):
         old_session_id = self.request.headers[Constant.AUTHORIZATION]
         redis_dao = user_redis_dao.UserRedisDAO()
         member_id = redis_dao.get_member_id_by_cell_phone(cell_phone_num)
-        auth_result = redis_dao.auth_session_id(member_id, old_session_id)
+        if member_id and old_session_id:
+            auth_result = redis_dao.auth_session_id(member_id, old_session_id)
+        elif old_session_id == "" and member_id:
+            return redis_dao.login(cell_phone_num)
         if auth_result:
             return redis_dao.login(cell_phone_num)
         else:
