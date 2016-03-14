@@ -68,3 +68,19 @@ class TestUserRedisDAO(unittest.TestCase):
             print(shop)
             for (key, value) in shop.items():
                 print(key + ":" + value)
+
+
+    def test_get_discount_by_id(self):
+        discount_id = "pvqMYQLdMYohuhRaRSiquX"
+        discount = self.userDAO.get_discount_by_id(discount_id)
+        print(discount)
+
+    def test_fetch_discounts(self):
+        member_id = 'gST8epDEBF8ep4xdcJcGo2'
+        print(self.userDAO.fetch_discounts(member_id))
+
+    def test_use_discount(self):
+        member_id = 'gST8epDEBF8ep4xdcJcGo2'
+        discount_id = 'pvqMYQLdMYohuhRaRSiquX'
+        count = self.userDAO.use_discount(member_id,discount_id)
+        self.assertEqual(1,count)

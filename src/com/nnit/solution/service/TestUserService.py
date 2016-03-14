@@ -61,3 +61,20 @@ class TestUserService(unittest.TestCase):
         else:
             print("  fail --> " )
             print(data)
+
+    def test_use_discount(self):
+        member_id = "gST8epDEBF8ep4xdcJcGo2"
+        discount_id = "pvqMYQLdMYohuhRaRSiquX"
+        params = urllib.urlencode({'member_id':member_id, 'discount_id':discount_id})
+        headers = {"Content-Type": "application/x-www-form-urlencoded"}
+        conn = httplib.HTTPConnection("localhost:8888")
+        conn.request('POST', '/shoppingmall/member/discounts/consume', params, headers)
+
+        resp = conn.getresponse()
+        data = resp.read()
+        if resp.status == 200:
+            print("success -> ")
+            print(data)
+        else:
+            print("  fail --> " )
+            print(data)

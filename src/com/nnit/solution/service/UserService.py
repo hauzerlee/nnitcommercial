@@ -164,7 +164,7 @@ class MemberServices(pyrestful.rest.RestHandler):
         return redis_dao.fetch_coupons(member_id)
 
     # REST-GET
-    @get(_path="/shoppingmall/discounts/{discountid}", _produces=mediatypes.APPLICATION_JSON )
+    @get(_path="/shoppingmall/discounts/{discountid}", _type=[str], _produces=mediatypes.APPLICATION_JSON )
     def get_discount_detail(self,discount_id):
         """
         返回优惠券的详细信息
@@ -172,7 +172,30 @@ class MemberServices(pyrestful.rest.RestHandler):
         :return 优惠券的详细信息
         """
         redis_dao = user_redis_dao.UserRedisDAO()
-        return redis_dao.get_coupon_by_id(discount_id)
+        return redis_dao.get_discount_by_id(discount_id)
+
+    # REST-GET
+    @get(_path="/shoppingmall/discounts/members/{member_id}", _produces=mediatypes.APPLICATION_JSON)
+    def fetch_discounts(self, member_id):
+        redis_dao = user_redis_dao.UserRedisDAO()
+        discounts ={}
+        discounts["discounts"] = redis_dao.fetch_discounts(member_id)
+        return discounts
+
+    # REST-POST
+    @post(_path="/shoppingmall/member/discounts/consume",_types=[bytes, bytes], _produces=mediatypes.APPLICATION_JSON)
+    def user_discount(self, member_id, discount_id):
+        """
+        消费一个折扣
+        :param member_id:
+        :param discount_id:
+        :return:
+        """
+        redis_dao = user_redis_dao.UserRedisDAO()
+        count = redis_dao.use_discount(member_id, discount_id)
+        result = {}
+        result["count"] = count
+        return result
 
     # REST-GET
     @get(_path="/shoppingmall/coupons/members/{member_id}", _produces=mediatypes.APPLICATION_JSON)

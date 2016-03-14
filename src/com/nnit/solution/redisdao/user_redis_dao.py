@@ -300,6 +300,59 @@ class UserRedisDAO(object):
         self.redis.sadd(redis_key, trx) #交易记录
 
 
+    def get_discount_by_id(self, discount_id):
+        """
+        提取折扣的详细信息
+        :param discount_id:
+        :return:
+        """
+        key_str = "Discount" + Constant.COLON + discount_id
+        discount_tmp = self.redis.hgetall(key_str)
+        discount = {}
+        for (key, value) in discount_tmp.items():
+            discount[key.decode('utf-8')] = value.decode('utf-8')
+        shop_id = discount['SHOP_ID']
+        shop_key_str = "Shop:" + shop_id
+        shop_tmp = self.redis.hgetall(shop_key_str)
+        shop = {}
+        for (key, value) in shop_tmp.items():
+            shop[key.decode('utf-8')] = value.decode('utf-8')
+        discount["SHOP"] = shop
+        return discount
+
+    def fetch_discounts(self, member_id):
+        """
+        提取某一个用户所具有的折扣
+        返回一个折扣的列表
+        :param member_id:
+        :return:
+        """
+
+        key_str = "Discount" + Constant.COLON + member_id
+        discount_ids = self.redis.smembers(key_str)
+        discounts = []
+        index = 0
+        for discount_id in discount_ids:
+            discounts.insert(index, self.get_discount_by_id(discount_id.decode('utf-8')))
+            index += 1
+        return discounts
+
+    def use_discount(self, member_id, discount_id):
+        """
+
+        :param member_id:
+        :param discount_id:
+        :return:
+        """
+
+        key_str = "Discount" + Constant.COLON + member_id
+        has_this_discount = self.redis.sismember(key_str, discount_id)
+        if has_this_discount:
+            return self.redis.srem(key_str, discount_id)
+        else:
+            return 0
+
+
 class UserNotExistException(object):
     def __init__(self):
         pass
